@@ -9,7 +9,7 @@ MONTHS ?=
 ROWS_PER_MONTH ?=
 DATA_ARGS := --profile $(PROFILE) $(if $(MONTHS),--months $(MONTHS),) $(if $(ROWS_PER_MONTH),--rows-per-month $(ROWS_PER_MONTH),)
 
-.PHONY: help setup data data-small data-medium data-large parquet demo demo-small demo-medium demo-large sql sizes verify clean clean-venv clean-all
+.PHONY: help setup check-duckdb data data-small data-medium data-large parquet demo demo-small demo-medium demo-large sql sizes verify clean clean-venv clean-all
 
 help:
 	@echo "DuckDB + Parquet demo targets"
@@ -23,7 +23,7 @@ help:
 	@echo "  make demo        Run the Python DuckDB demo"
 	@echo "  make demo-medium Generate, convert, query, and compare the medium dataset"
 	@echo "  make demo-large  Generate, convert, query, and compare the large dataset"
-	@echo "  make sql         Run queries.sql through Python DuckDB"
+	@echo "  make sql         Run queries.sql with the DuckDB CLI"
 	@echo "  make sizes       Compare CSV and Parquet storage"
 	@echo "  make verify      Compile scripts and run the full demo flow"
 	@echo "  make clean       Remove generated data"
@@ -31,6 +31,9 @@ help:
 	@echo "  make clean-all   Remove generated data and the virtual environment"
 
 setup: $(STAMP)
+
+check-duckdb:
+	@command -v duckdb >/dev/null || (echo "DuckDB CLI not found. Install it with: brew install duckdb" && exit 1)
 
 $(VENV):
 	$(PYTHON) -m venv $(VENV)
@@ -76,18 +79,17 @@ demo-large: data-large setup
 	$(PY) demo.py
 	$(PY) compare_storage.py
 
-sql: parquet
-	$(PY) run_sql.py
+sql: check-duckdb parquet
+	duckdb -c ".read queries.sql"
 
 sizes: setup
 	$(PY) compare_storage.py
 
 verify: setup
-	$(PY) -m py_compile generate_sample_data.py build_parquet.py demo.py compare_storage.py run_sql.py
+	$(PY) -m py_compile generate_sample_data.py build_parquet.py demo.py compare_storage.py
 	$(PYTHON) generate_sample_data.py --profile small
 	$(PY) build_parquet.py
 	$(PY) demo.py
-	$(PY) run_sql.py
 	$(PY) compare_storage.py
 
 clean:
