@@ -77,17 +77,17 @@ demo-large: data-large setup
 	$(PY) compare_storage.py
 
 sql: parquet
-	$(PY) -c "import duckdb; con = duckdb.connect(); con.execute(open('queries.sql').read())"
+	$(PY) run_sql.py
 
 sizes: setup
 	$(PY) compare_storage.py
 
 verify: setup
-	$(PY) -m py_compile generate_sample_data.py build_parquet.py demo.py compare_storage.py
+	$(PY) -m py_compile generate_sample_data.py build_parquet.py demo.py compare_storage.py run_sql.py
 	$(PYTHON) generate_sample_data.py --profile small
 	$(PY) build_parquet.py
 	$(PY) demo.py
-	$(PY) -c "import duckdb; con = duckdb.connect(); con.execute(open('queries.sql').read())"
+	$(PY) run_sql.py
 	$(PY) compare_storage.py
 
 clean:

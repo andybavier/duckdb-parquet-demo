@@ -160,4 +160,5 @@ TO 'data/parquet/customer_monthly_amount.parquet'
 - `build_parquet.py`: reads CSV or Excel invoice files, normalizes columns, and writes Parquet.
 - `compare_storage.py`: compares CSV and Parquet file sizes and reports the Parquet compression codec.
 - `queries.sql`: DuckDB SQL examples.
+- `run_sql.py`: executes `queries.sql` and prints results from each query.
 - `demo.py`: runs a few DuckDB queries from Python and prints pandas DataFrames.
