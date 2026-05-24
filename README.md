@@ -1,6 +1,6 @@
-# DuckDB + Parquet Local Demo
+# DuckDB + Parquet Demo
 
-This is a runnable teaching demo for learning how DuckDB can query Parquet files directly.
+This is a runnable demo for learning how DuckDB can query Parquet files directly.
 
 The workflow:
 
