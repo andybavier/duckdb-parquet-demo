@@ -60,7 +60,7 @@ That target:
 3. Converts the CSV files to partitioned Parquet.
 4. Runs a few DuckDB queries from Python.
 
-Run the SQL file through the DuckDB CLI:
+After Parquet files exist, run the SQL file through the DuckDB CLI:
 
 ```bash
 make sql
@@ -107,7 +107,7 @@ You can also customize the generated data:
 make demo PROFILE=medium MONTHS=3 ROWS_PER_MONTH=50000
 ```
 
-Compare CSV and Parquet storage after any run:
+Compare existing CSV and Parquet storage after any run:
 
 ```bash
 make sizes
@@ -317,7 +317,7 @@ Then create the view inside that session. The view definition is stored in `demo
 
 ## Example Questions
 
-Run the SQL examples:
+Run the SQL examples against the existing Parquet files:
 
 ```bash
 make sql

@@ -9,7 +9,7 @@ MONTHS ?=
 ROWS_PER_MONTH ?=
 DATA_ARGS := --profile $(PROFILE) $(if $(MONTHS),--months $(MONTHS),) $(if $(ROWS_PER_MONTH),--rows-per-month $(ROWS_PER_MONTH),)
 
-.PHONY: help setup check-duckdb data data-small data-medium data-large parquet demo demo-small demo-medium demo-large sql sizes verify clean clean-venv clean-all
+.PHONY: help setup check-duckdb check-parquet data data-small data-medium data-large parquet demo demo-small demo-medium demo-large sql sizes verify clean clean-venv clean-all
 
 help:
 	@echo "DuckDB + Parquet demo targets"
@@ -23,8 +23,8 @@ help:
 	@echo "  make demo        Run the Python DuckDB demo"
 	@echo "  make demo-medium Generate, convert, query, and compare the medium dataset"
 	@echo "  make demo-large  Generate, convert, query, and compare the large dataset"
-	@echo "  make sql         Run queries.sql with the DuckDB CLI"
-	@echo "  make sizes       Compare CSV and Parquet storage"
+	@echo "  make sql         Run queries.sql with the DuckDB CLI against existing Parquet files"
+	@echo "  make sizes       Compare existing CSV and Parquet storage"
 	@echo "  make verify      Compile scripts and run the full demo flow"
 	@echo "  make clean       Remove generated data"
 	@echo "  make clean-venv  Remove the Python virtual environment"
@@ -34,6 +34,9 @@ setup: $(STAMP)
 
 check-duckdb:
 	@command -v duckdb >/dev/null || (echo "DuckDB CLI not found. Install it with: brew install duckdb" && exit 1)
+
+check-parquet:
+	@test -n "$$(find data/parquet/invoices -name '*.parquet' -print -quit 2>/dev/null)" || (echo "No Parquet files found. Run: make parquet" && exit 1)
 
 $(VENV):
 	$(PYTHON) -m venv $(VENV)
@@ -79,10 +82,10 @@ demo-large: data-large setup
 	$(PY) demo.py
 	$(PY) compare_storage.py
 
-sql: check-duckdb parquet
+sql: check-duckdb check-parquet
 	duckdb -c ".read queries.sql"
 
-sizes: setup
+sizes: setup check-parquet
 	$(PY) compare_storage.py
 
 verify: setup
